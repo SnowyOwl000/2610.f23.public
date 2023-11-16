@@ -1,4 +1,5 @@
 #include <iostream>
+#include <random>
 
 using namespace std;
 
@@ -96,8 +97,36 @@ int getHumanMove(int playerNum) {
 }
 
 int main() {
+    random_device
+        rd;
+    mt19937
+        mt(rd());
+    uniform_int_distribution<>
+        dis(0,1);
+    int
+        currentPlayer = 1,
+        computerNum;
 
-    printBoard();
+    // select a player for X
+    computerNum = dis(mt) * 2 - 1;
+
+    // loop at most 9 times {
+
+        // get move from current player... display board if it's human's turn
+
+        // fill in location in board[]... use current player's number
+
+        // if current player has won {
+
+            // output appropriate message
+
+            // return
+        // }
+
+        // it's now the other player's turn... switch current player
+    // }
+
+    // if we get here, game is a draw
 
     return 0;
 }
