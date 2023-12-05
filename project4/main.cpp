@@ -3,6 +3,7 @@
 #include <cstring>
 #include <sys/stat.h>
 #include <random>
+#include "codec.h"
 
 using namespace std;
 
@@ -151,11 +152,95 @@ void keyGen() {
 }
 
 void encrypt(char *inName,char *outName,int64_t n,int64_t e) {
+    ifstream
+        inFile;
+    Codec64
+        codec;
+    uint32_t
+        fileSize,
+        plain,cipher;
+    uint8_t
+        c1,c2,c3;
 
+    // open input file and check to make sure it worked
+
+    // get the file size for input file and remember it
+    fileSize = getFileSize(inName);
+
+    // create Codec64 object and prepare it for writing
+    codec.beginEncode(outName);
+
+    // write file size to codec
+    codec.put32(fileSize);
+
+    // while bytes read < file size, do {
+
+        // read c1, c2 and c3 from input file
+        c1 = inFile.get();
+
+        // combine them into one number
+        plain = c1 + 256 * c2 + 65536 * c3;
+
+        // encrypt number with modExp
+        cipher = modExp(plain,e,n);
+
+        // send encrypted value to codec
+        codec.put32(cipher);
+
+    // }
+
+    // tell codec to stop
+    codec.endEncode();
+
+    // close input file
 }
 
 void decrypt(char *inName,char *outName,int64_t n,int64_t d) {
+    ofstream
+        outFile;
+    Codec64
+        codec;
+    uint32_t
+        fileSize,
+        plain,cipher;
+    uint8_t
+        c1,c2,c3;
 
+    // open output file and make sure it worked
+
+    // create Codec64 object and prepare it for reading
+
+    // get file size from codec
+    codec.get32(fileSize);
+
+    // while bytes written < file size, do {
+
+        // get value from codec
+
+        // decrypt value using modExp
+        plain = modExp(cipher,d,n);
+
+        // extract c1, c2, c3 from decrypted number
+        c1 = plain % 256;
+        plain = plain / 256;
+
+        c2 = plain % 256;
+        plain /= 256;
+
+        c3 = plain % 256;
+
+        // output c1, c2 and c3... but only if bytes written < file size
+        outFile << c1;
+
+        // if bytes written < file size, write c2 same way
+
+        // if bytes written < file size, write c3 same way
+
+    // }
+
+    // tell codec to stop
+
+    // close output file
 }
 
 void usage(char *progName) {
